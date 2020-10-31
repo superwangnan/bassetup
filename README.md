@@ -1,0 +1,2 @@
+# bassetup
+setup bas env
