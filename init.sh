@@ -8,5 +8,6 @@ sh ~/.vim_runtime/install_awesome_vimrc.sh
 mkdir ~/.config/nvim
 cp ~/.vimrc ~/.config/nvim/init.vim
 npm config set registry https://mirrors.huaweicloud.com/repository/npm/
+npm config set @sap:registry=https://registry.npmjs.org
 touch ~/.vim_runtime/my_configs.vim
 echo colorscheme desert >> ~/.vim_runtime/my_configs.vim
