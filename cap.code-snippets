@@ -1,0 +1,193 @@
+{
+	// Place your global snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and 
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope 
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is 
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are: 
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. 
+	// Placeholders with the same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"scope": "javascript,typescript",
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+	"setup uaa in mta": {
+		"prefix": "cap_mta_uaa",
+		"body": [
+			"# ------------------------------------------------------------",
+			" - name: bookshop-uaa",
+			"# ------------------------------------------------------------",
+			"   type: org.cloudfoundry.managed-service",
+			"   parameters:",
+			"     service: xsuaa",
+			"     service-plan: application  ",
+			"     path: ./xs-security.json",
+			"     config:",
+			"       xsappname: 'bookshop905-\\${space}'",
+			"       role-collections:",
+			"         - name: 'bookshop905-\\${space}'",
+			"           description: Manage bookshop",
+			"           role-template-references:",
+			"             - \\$XSAPPNAME.admin"
+		],
+		"description": "setup uaa in mta"
+	},
+	"acquire pool timeout": {
+		"prefix": "cap_pool_param",
+		"body": [
+			"\"pool\": {",
+			"    \"acquireTimeoutMillis\": 50000,",
+			"    \"min\": 0,",
+			"    \"max\": 50",
+			"}"
+		],
+		"description": "acquire pool timeout"
+	},
+	"xs-security.json white list": {
+		"prefix": "cap_xs-security_whitelist",
+		"body": [
+			",",
+			"\"oauth2-configuration\": {",
+			"    \"redirect-uris\": [",
+			"        \"https://*.oncloud.top/**\",",
+			"        \"https://*.cloud.sap/**\",",
+			"        \"https://*.hana.ondemand.com/**\",",
+			"        \"https://*.vlab-sapcloudplatformdev.cn/**\"",
+			"    ]",
+			"}"
+		],
+		"description": "xs-security.json white list"
+	},
+	"sample cds view definition": {
+		"prefix": "cap_db_schema.cds",
+		"body": [
+			"using { Currency, managed, sap } from '@sap/cds/common';",
+			"namespace sap.capire.bookshop;",
+			"",
+			"entity Books : managed {",
+			"  key ID : Integer;",
+			"  title  : localized String(111);",
+			"  descr  : localized String(1111);",
+			"  author : Association to Authors;",
+			"  genre  : Association to Genres;",
+			"  stock  : Integer;",
+			"  price  : Decimal;",
+			"  currency : Currency;",
+			"  image : LargeBinary @Core.MediaType : 'image/png';",
+			"}",
+			"",
+			"entity Authors : managed {",
+			"  key ID : Integer;",
+			"  name   : String(111);",
+			"  dateOfBirth  : Date;",
+			"  dateOfDeath  : Date;",
+			"  placeOfBirth : String;",
+			"  placeOfDeath : String;",
+			"  books  : Association to many Books on books.author = $self;",
+			"}",
+			"",
+			"/** Hierarchically organized Code List for Genres */",
+			"entity Genres : sap.common.CodeList {",
+			"  key ID   : Integer;",
+			"  parent   : Association to Genres;",
+			"  children : Composition of many Genres on children.parent = $self;",
+			"}",
+			""
+		],
+		"description": "sample cds view definition"
+	},
+	"sample service view definition": {
+		"prefix": "cap_srv_service.cds",
+		"body": [
+			"using { sap.capire.bookshop as my } from '../db/schema';",
+			"service AdminService @(requires:'admin') {",
+			"  entity Books as projection on my.Books;",
+			"  entity Authors as projection on my.Authors;",
+			"}",
+			""
+		],
+		"description": "sample cds view definition"
+	},
+	"add dest in default-env.json": {
+		"prefix": "cap_default-env.json_destination",
+		"body": [
+			"\"destinations\": [",
+			"    {",
+			"        \"name\": \"env_destination_saphome\",",
+			"        \"url\": \"http://sap.com/\"",
+			"    },",
+			"    {",
+			"        \"name\": \"env_destination_mysrv\",",
+			"        \"url\": \"https://msgmock.cfapps.eu10.hana.ondemand.com\",",
+			"        \"forwardAuthToken\": true",
+			"    }"
+		],
+		"description": "add dest in default-env.json"
+	},
+	"sample xs-app.json": {
+		"prefix": "cap_xs-app.json",
+		"body": [
+			"",
+			"{",
+			"    \"welcomeFile\": \"/app/risks/webapp/index.html\",",
+			"    \"authenticationMethod\": \"route\",",
+			"    \"sessionTimeout\": 30,",
+			"    \"logout\": {",
+			"        \"logoutEndpoint\": \"/do/logout\",",
+			"        \"logoutPage\": \"/\"",
+			"    },",
+			"    \"routes\": [",
+			"        {",
+			"            \"source\": \"^/app/(.*)$\",",
+			"            \"target\": \"$1\",",
+			"            \"localDir\": \"resources\",",
+			"            \"authenticationType\": \"xsuaa\"",
+			"        },",
+			"        {",
+			"            \"source\": \"^/service/(.*)$\",",
+			"            \"destination\": \"srv-binding\",",
+			"            \"authenticationType\": \"xsuaa\"",
+			"        }",
+			"     ]",
+			"}"
+		],
+		"description": "sample xs-app.json"
+	},
+	"sample http request for token": {
+		"prefix": "cap_fetch_token",
+		"body": [
+			"@client_id = sb-bookshop905-demo!t327",
+			"@client_secret = lX4JaQK3m0d7qJFEyq0GRSyXldY=",
+			"@auth_url = https://demo2021.authentication.cn40.platform.sapcloud.cn",
+			"",
+			"### -----------------------------------",
+			"# get token",
+			"# @name login",
+			"POST {{auth_url}}/oauth/token HTTP/1.1",
+			"Content-Type: application/x-www-form-urlencoded",
+			"Accept: application/json",
+			"",
+			"client_id={{client_id}}&client_secret={{client_secret}}&scope=&grant_type=client_credentials&token_format=jwt",
+			"### ",
+			"@authToken = {{login.response.body.access_token}}",
+			"",
+			"",
+			"### -----------------------------------",
+			"# get token",
+			"# @name login",
+			"POST {{auth_url}}/oauth/token HTTP/1.1",
+			"Content-Type: application/x-www-form-urlencoded",
+			"Accept: application/json",
+			"",
+			"client_id={{client_id}}&client_secret={{client_secret}}&grant_type=password&username={{scpuser}}&password={{scppwd}}&token_format=jwt",
+			"### ",
+			"@authToken = {{login.response.body.access_token}}",
+			""
+		],
+		"description": "sample http request for token"
+	}
+}
